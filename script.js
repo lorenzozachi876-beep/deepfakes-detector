@@ -1,4 +1,11 @@
-console.log("SCRIPT ATIVO");
+let model;
+
+async function carregarModelo() {
+  model = await tf.loadLayersModel("./model/model.json");
+  console.log("Modelo carregado!");
+}
+
+carregarModelo();
 
 const input = document.getElementById("arquivo");
 const nomeArquivo = document.getElementById("nomeArquivo");
@@ -42,26 +49,38 @@ botao.addEventListener("click", async (e) => {
   mostrarLoader();
 
   try {
-    const formData = new FormData();
-    formData.append("arquivo", arquivoAtual);
 
-    const resposta = await fetch("http://127.0.0.1:5000/analisar", {
-      method: "POST",
-      body: formData
-    });
+    // Lê o arquivo
+    const arrayBuffer = await arquivoAtual.arrayBuffer();
 
-    const data = await resposta.json();
+    console.log(arrayBuffer);
+
+    // Dados temporários para testar o modelo
+    const inputTensor = tf.randomNormal([1, 128]);
+
+    // Faz previsão
+    const prediction = model.predict(inputTensor);
+
+    // Resultado
+    const valor = await prediction.data();
+
+    // Porcentagem
+    const chanceIA = (valor[0] * 100).toFixed(2);
 
     esconderLoader();
 
-    // garante que não “pisca”
-    requestAnimationFrame(() => {
-      resultado.innerText = `${data.chance_ia}% chance de ser IA`;
-    });
+    resultado.innerText =
+      `${chanceIA}% chance de ser IA`;
 
   } catch (err) {
+
+    console.error(err);
+
     esconderLoader();
-    resultado.innerText = "Erro ao conectar com backend.";
+
+    resultado.innerText =
+      "Erro ao analisar áudio.";
+
   }
 
   processando = false;
