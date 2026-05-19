@@ -57,7 +57,7 @@ botao.addEventListener("click", async (e) => {
     console.log(arrayBuffer);
 
     // Dados temporários para testar o modelo
-    const inputTensor = tf.randomNormal([1, 128]);
+    const inputTensor = tf.randomNormal([1, 40]);
 
     // Faz previsão
     const prediction = model.predict(inputTensor);
