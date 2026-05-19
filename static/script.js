@@ -1,12 +1,4 @@
-let model;
-
-async function carregarModelo() {
-  model = await tf.loadLayersModel("./model/model.json");
-  console.log(model);
-  console.log(model.inputs);
-}
-
-carregarModelo();
+console.log("SCRIPT ATIVO");
 
 const input = document.getElementById("arquivo");
 const nomeArquivo = document.getElementById("nomeArquivo");
@@ -51,27 +43,20 @@ botao.addEventListener("click", async (e) => {
 
   try {
 
-    // Lê o arquivo
-    const arrayBuffer = await arquivoAtual.arrayBuffer();
+    const formData = new FormData();
+    formData.append("arquivo", arquivoAtual);
 
-    console.log(arrayBuffer);
+    const resposta = await fetch("/analisar", {
+      method: "POST",
+      body: formData
+    });
 
-    // Dados temporários para testar o modelo
-    const inputTensor = tf.randomNormal([1, 40]);
-
-    // Faz previsão
-    const prediction = model.predict(inputTensor);
-
-    // Resultado
-    const valor = await prediction.data();
-
-    // Porcentagem
-    const chanceIA = (valor[0] * 100).toFixed(2);
+    const data = await resposta.json();
 
     esconderLoader();
 
     resultado.innerText =
-      `${chanceIA}% chance de ser IA`;
+      `${data.chance_ia}% chance de ser IA`;
 
   } catch (err) {
 
