@@ -10,8 +10,10 @@ app = Flask(__name__)
 CORS(app)
 
 # carrega modelo
-model = tf.keras.models.load_model("deepfake_audio_model.keras")
-
+model = tf.keras.models.load_model(
+    "modelo_render.h5",
+    compile=False
+)
 
 def extract_features(file_path):
     audio, sr = librosa.load(file_path, duration=3)
